@@ -15,6 +15,7 @@ jupyter = "^1.1.1"
 notebook = "^7.2.2"
 wandb = "^0.18.3"
 autopep8 = "^2.3.1"
+lightning = "^2.4.0"
 
 [build-system]
 requires = ["poetry-core"]
