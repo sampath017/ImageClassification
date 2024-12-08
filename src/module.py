@@ -12,10 +12,11 @@ class VGGBlock(nn.Module):
         block1_in_channels=3,
         block1_out_channels=8,
         block2_in_channels=8,
-        block2_out_channels=8
+        block2_out_channels=8,
+        max_pool=False
     ):
         super().__init__()
-        self.block = nn.Sequential(
+        layers = [
             # Block 1
             nn.Conv2d(
                 in_channels=block1_in_channels,
@@ -36,8 +37,12 @@ class VGGBlock(nn.Module):
             ),
             nn.BatchNorm2d(num_features=block2_out_channels),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(2, 2), stride=2)
-        )
+        ]
+
+        if max_pool:
+            layers.append(nn.MaxPool2d(kernel_size=(2, 2), stride=2))
+
+        self.block = nn.Sequential(*layers)
 
     def forward(self, x):
         return self.block(x)
@@ -47,9 +52,15 @@ class VGGNet(nn.Module):
     def __init__(self):
         super().__init__()
         self.feature_extractor = nn.Sequential(
-            VGGBlock(3, 8, 8, 16),
-            VGGBlock(16, 32, 32, 64),
-            VGGBlock(64, 128, 128, 512),
+            VGGBlock(3, 8, 8, 16, max_pool=True),
+            VGGBlock(16, 32, 32, 64, max_pool=True),
+            VGGBlock(64, 128, 128, 512, max_pool=True),
+            VGGBlock(512, 512, 512, 512, max_pool=True),
+            VGGBlock(512, 512, 512, 512),
+            VGGBlock(512, 512, 512, 512),
+            VGGBlock(512, 512, 512, 512),
+            VGGBlock(512, 512, 512, 512),
+            VGGBlock(512, 512, 512, 512),
             VGGBlock(512, 512, 512, 512)
         )
 
@@ -82,7 +93,7 @@ class QuickModule:
         acc = accuracy(logits, y)
 
         return loss, acc
-    
+
     def load_from_checkpoint(self, path):
         self.optimizer_func = self.optimizer()
         checkpoint = torch.load(path, weights_only=True)
