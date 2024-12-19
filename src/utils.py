@@ -24,10 +24,13 @@ def accuracy(logits, y):
     return accuracy
 
 
-def load_from_checkpoint(path, model, optimizer, lr_scheduler=None):
+def load_from_checkpoint(path, model, optimizer=None, lr_scheduler=None, device="cpu"):
     checkpoint = torch.load(path, weights_only=True)
     model.load_state_dict(checkpoint["model"])
-    optimizer.load_state_dict(checkpoint["optimizer"])
+    model = model.to(device)
+
+    if optimizer:
+        optimizer.load_state_dict(checkpoint["optimizer"])
 
     if lr_scheduler:
         lr_scheduler = lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])

@@ -22,8 +22,10 @@ class EarlyStoppingCallback:
         self.waited_epochs = 0
         self.min_val_accuracy = min_val_accuracy
         self.check_early_stopping = False
+        self.counted = False
 
     def check(self, epoch_train_accuracy, epoch_val_accuracy):
+        self.counted = False
         stop_training = False
         if not self.check_early_stopping and (epoch_val_accuracy >= self.min_val_accuracy):
             print("Early stopping check started!")
@@ -33,6 +35,7 @@ class EarlyStoppingCallback:
             diff = epoch_train_accuracy - epoch_val_accuracy
             if diff > self.accuracy_diff:
                 self.waited_epochs += 1
+                self.counted = True
                 if self.waited_epochs >= self.wait_epochs:
                     stop_training = True
 
